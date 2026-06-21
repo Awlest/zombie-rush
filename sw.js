@@ -1,5 +1,5 @@
-/* Zombie Rush - service worker (offline + maj automatique) */
-var CACHE='zr-v2';
+/* Zombie Rush - service worker (offline + maj automatique fiable) */
+var CACHE='zr-v3';
 var ASSETS=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',function(e){
@@ -15,9 +15,9 @@ self.addEventListener('fetch',function(e){
   if(e.request.method!=='GET')return;
   var isDoc=(e.request.mode==='navigate'||e.request.destination==='document');
   if(isDoc){
-    // network-first : on prend la derniere version en ligne, cache en secours hors-ligne
+    // HTML : toujours la derniere version (on contourne le cache HTTP du navigateur)
     e.respondWith(
-      fetch(e.request).then(function(res){
+      fetch(e.request,{cache:'reload'}).then(function(res){
         var copy=res.clone();
         caches.open(CACHE).then(function(c){try{c.put('./index.html',copy);}catch(_){}});
         return res;
@@ -25,7 +25,7 @@ self.addEventListener('fetch',function(e){
     );
     return;
   }
-  // cache-first pour le reste (icones, manifest)
+  // reste (icones, manifest) : cache d'abord
   e.respondWith(
     caches.match(e.request).then(function(hit){
       return hit || fetch(e.request).then(function(res){

@@ -833,7 +833,12 @@ window.ZR={get G(){return G;},get state(){return state;},startLevel:startLevel,
 
 /* ---------- Service worker ---------- */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(window.__zrReloaded)return; window.__zrReloaded=true; location.reload();
+  });
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){if(reg.update)reg.update();}).catch(function(){});
+  });
 }
 })();
 </script>
