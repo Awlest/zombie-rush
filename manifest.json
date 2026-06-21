@@ -1,0 +1,17 @@
+{
+  "name": "Zombie Rush",
+  "short_name": "ZombieRush",
+  "description": "Fais grossir ton escouade, ramasse des armes et explose des hordes de zombies sur 25 niveaux.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1424",
+  "theme_color": "#0f1424",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
