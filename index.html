@@ -257,9 +257,9 @@ function levelCfg(L){
 }
 function pickType(L){
   var prog=G.spawned/G.cfg.quota;
-  if(prog<0.20) return (L>=3&&Math.random()<0.2)?'runner':'walker';   // ouverture douce: le temps de grossir depuis 1
-  var pool=[['walker',8]];
-  if(L>=3) pool.push(['runner',5+L*0.24]);
+  if(prog<0.15) return (L>=2&&Math.random()<0.28)?'runner':'walker';   // ouverture courte: juste le temps d'amorcer depuis 1
+  var pool=[['walker',7]];
+  if(L>=2) pool.push(['runner',5.5+L*0.30]);
   if(L>=7) pool.push(['brute',2+L*0.18]);
   if(L>=5 && prog>0.32) pool.push(['kamikaze',1.0+L*0.13]);
   if(L>=9 && prog>0.34) pool.push(['exploder',1.3+L*0.16]);
@@ -291,8 +291,8 @@ var squadY=function(){return H-118;};
 /* ---------- Helpers ---------- */
 function clamp(v,a,b){return v<a?a:(v>b?b:v);}
 function rnd(a,b){return a+Math.random()*(b-a);}
-function blobWidth(){return G.blobR*1.7;}
-function recalcBlob(){G.blobR=clamp(24+Math.sqrt(G.count)*4,24,72);}
+function blobWidth(){return G.blobR*1.62;}
+function recalcBlob(){G.blobR=clamp(22+Math.sqrt(G.count)*3.7,22,70);}
 
 function floatText(x,y,txt,color){G.floats.push({x:x,y:y,txt:txt,color:color||'#fff',t:0});}
 function burst(x,y,color,n){ n=n||6; for(var i=0;i<n;i++){var a=Math.random()*6.28,sp=rnd(40,160);
@@ -304,12 +304,12 @@ function enemyShot(x,y,sp,dmg){var a=Math.atan2(squadY()-y,G.squadX-x),s=sp||190
 /* ---------- Spawns ---------- */
 function makeZombie(type,L){
   var t=ZTYPES[type];
-  var hp=(3.0+(L-1)*0.60)*t.hpMul;
-  var spd=(45+L*2.5)*t.spdMul;
+  var hp=(3.2+(L-1)*0.62)*t.hpMul;
+  var spd=(44+L*2.3)*t.spdMul;
   return {x:rnd(26,W-26),y:-30,type:type,r:t.r,hp:hp,maxhp:hp,spd:spd,color:t.color,strength:t.strength,hitT:0,boss:false,wob:Math.random()*6.28,shootT:rnd(1.2,2.6)};
 }
 function makeBoss(L){
-  var hp=220+L*120;
+  var hp=200+L*110;
   return {x:W/2,y:-70,type:'boss',r:48,hp:hp,maxhp:hp,spd:24+L*0.9,color:'#c0392b',strength:18,hitT:0,boss:true,wob:0,shootT:2.2};
 }
 function makeSpawn(x,y,L){
@@ -338,10 +338,7 @@ function spawnPickup(){
   }
 }
 
-/* ---------- Tir ---------- */
-function nearestZombie(){var best=null,bd=1e12,sy=squadY();
-  for(var i=0;i<G.zombies.length;i++){var z=G.zombies[i];if(z.y<sy-6){var dx=z.x-G.squadX,dy=z.y-sy,d=dx*dx+dy*dy;if(d<bd){bd=d;best=z;}}}
-  return best;}
+/* ---------- Tir (tout droit : il faut placer l'escouade sous les zombies) ---------- */
 function fire(dt){
   var w=WEAPONS[G.weapon];
   var rate=w.rate*(G.rapid>0?2:1);
@@ -352,12 +349,10 @@ function fire(dt){
     var sh=Math.min(G.count,cap);
     var scale=1+G.count/50;
     var bw=blobWidth(),myY=squadY()-12;
-    var base=-Math.PI/2,tz=nearestZombie();   // visée auto sur le zombie le plus proche
-    if(tz){var aa=Math.atan2(tz.y-myY,tz.x-G.squadX);base=clamp(aa,-Math.PI+0.12,-0.12);}
     for(var i=0;i<sh;i++){
       var bx=G.squadX+(sh>1?((i/(sh-1))-0.5):0)*bw;
       for(var p=0;p<w.pellets;p++){
-        var ang=base+(Math.random()*2-1)*w.spread;
+        var ang=-Math.PI/2+(Math.random()*2-1)*(w.spread>0.035?w.spread:0.035);
         G.bullets.push({x:bx,y:myY,vx:Math.cos(ang)*w.speed,vy:Math.sin(ang)*w.speed,
           dmg:w.dmg*scale,r:w.pellets>1?5:4,pierce:w.pierce,aoe:w.aoe||0,color:w.color});
       }
